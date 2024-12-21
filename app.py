@@ -4,7 +4,7 @@ from langchain_community.llms import Cohere  # Ensure you have this package inst
 import cohere
 
 # Load sentiment data from the specified file path
-sentiment_data = pd.read_csv(r"C:\Users\Surya\Downloads\products_reviews_with_sentiment.csv")
+sentiment_data = pd.read_csv("products_reviews_with_sentiment.csv")
 
 # Initialize Cohere (Replace with your Cohere API Key)
 cohere_api_key = 'gptwR4P8VYhjXvT96D766hbDBTkFeJLIeR8ikBNh'  # Replace with your actual API key
