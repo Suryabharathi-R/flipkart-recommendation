@@ -48,8 +48,8 @@ def recommend_products(query, sentiment_data):
     # Sort products by sentiment score
     recommendations = recommendations.sort_values(by='Sentiment_Score', ascending=False)
 
-    # Return top 5 products
-    return recommendations[['Product_Name', 'Sentiment_Score']].head(5)
+    # Return the names of the top 5 products
+    return recommendations[['Product_Name']].head(5)
 
 # Streamlit app layout
 st.set_page_config(page_title="Product Recommendation Engine", layout="wide")
@@ -57,49 +57,45 @@ st.title("🌟 Product Recommendation Engine 🌟")
 st.markdown("### Find the best products based on your preferences!")
 st.markdown("Enter your product preferences or query below, then click **Search**.")
 
-# File path for CSV (directly inserted)
-csv_file_path = r"C:\Users\surya\Downloads\products_reviews_with_sentiment.csv"
+# File upload widget
+uploaded_file = st.file_uploader("Upload a CSV file containing product data", type=['csv'])
 
-# Attempt to load the CSV file
-try:
-    sentiment_data = pd.read_csv(csv_file_path)
-    st.write(f"Data from CSV file loaded successfully. Preview of data:")
-    st.write(sentiment_data.head())
+if uploaded_file is not None:
+    try:
+        # Read the uploaded CSV file
+        sentiment_data = pd.read_csv(uploaded_file)
 
-    # Input for user query
-    user_query = st.text_input("What are you looking for? (e.g., best camera phone, lightweight, etc.)", "")
+        # Input for user query
+        user_query = st.text_input("What are you looking for? (e.g., best camera phone, lightweight, etc.)", "")
 
-    # Search button
-    if st.button("Search"):
-        if user_query:  # Check if the user has entered a query
-            # Get top 5 product recommendations based on the query
-            recommended_products = recommend_products(user_query, sentiment_data)
+        # Search button
+        if st.button("Search"):
+            if user_query:  # Check if the user has entered a query
+                # Get top 5 product recommendations based on the query
+                recommended_products = recommend_products(user_query, sentiment_data)
 
-            if not recommended_products.empty:
-                st.markdown("### Recommended Products:")
-                # Display recommended products in a well-formatted manner
-                for index, row in recommended_products.iterrows():
-                    st.markdown(f"- **{row['Product_Name']}** with Sentiment Score: {row['Sentiment_Score']:.2f}")
+                if not recommended_products.empty:
+                    st.markdown("### Recommended Products:")
+                    # Display recommended products in a well-formatted manner, only showing product names
+                    for index, row in recommended_products.iterrows():
+                        st.markdown(f"- **{row['Product_Name']}**")
+                else:
+                    st.warning("No recommendations found based on your query. Please try a different query.")
             else:
-                st.warning("No recommendations found based on your query. Please try a different query.")
-        else:
-            st.warning("Please enter a product preference or query before clicking the search button.")
+                st.warning("Please enter a product preference or query before clicking the search button.")
 
-    # Option to download the recommended products as a CSV
-    top_recommended_products = get_top_recommended_products(csv_file_path)
-    if top_recommended_products is not None:
-        csv = top_recommended_products[['Product_Name', 'Sentiment_Score']].to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Top Recommended Products",
-            data=csv,
-            file_name='top_recommended_products.csv',
-            mime='text/csv'
-        )
+        # Option to download the recommended products as a CSV (optional download functionality)
+        top_recommended_products = get_top_recommended_products(uploaded_file)
+        if top_recommended_products is not None:
+            csv = top_recommended_products[['Product_Name', 'Sentiment_Score']].to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="Download Top Recommended Products",
+                data=csv,
+                file_name='top_recommended_products.csv',
+                mime='text/csv'
+            )
 
-except Exception as e:
-    st.error(f"Error reading the CSV file: {e}")
-
-# Footer
-st.markdown("---")
-st.markdown("### Need Help?")
-st.markdown("Feel free to reach out if you have any questions or need assistance!")
+    except Exception as e:
+        st.error(f"Error reading the CSV file: {e}")
+else:
+    st.warning("Please upload a CSV file to get started.")
