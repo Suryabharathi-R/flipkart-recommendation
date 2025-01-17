@@ -57,45 +57,47 @@ st.title("🌟 Product Recommendation Engine 🌟")
 st.markdown("### Find the best products based on your preferences!")
 st.markdown("Enter your product preferences or query below, then click **Search**.")
 
-# File upload widget
-uploaded_file = st.file_uploader("Upload a CSV file containing product data", type=['csv'])
+# File path for CSV (directly inserted)
+csv_file_path = r"C:\Users\surya\Downloads\products_reviews_with_sentiment.csv"
 
-if uploaded_file is not None:
-    try:
-        # Read the uploaded CSV file
-        sentiment_data = pd.read_csv(uploaded_file)
+# Attempt to load the CSV file without displaying data preview
+try:
+    sentiment_data = pd.read_csv(csv_file_path)
 
-        # Input for user query
-        user_query = st.text_input("What are you looking for? (e.g., best camera phone, lightweight, etc.)", "")
+    # Input for user query
+    user_query = st.text_input("What are you looking for? (e.g., best camera phone, lightweight, etc.)", "")
 
-        # Search button
-        if st.button("Search"):
-            if user_query:  # Check if the user has entered a query
-                # Get top 5 product recommendations based on the query
-                recommended_products = recommend_products(user_query, sentiment_data)
+    # Search button
+    if st.button("Search"):
+        if user_query:  # Check if the user has entered a query
+            # Get top 5 product recommendations based on the query
+            recommended_products = recommend_products(user_query, sentiment_data)
 
-                if not recommended_products.empty:
-                    st.markdown("### Recommended Products:")
-                    # Display recommended products in a well-formatted manner, only showing product names
-                    for index, row in recommended_products.iterrows():
-                        st.markdown(f"- **{row['Product_Name']}**")
-                else:
-                    st.warning("No recommendations found based on your query. Please try a different query.")
+            if not recommended_products.empty:
+                st.markdown("### Recommended Products:")
+                # Display recommended products in a well-formatted manner, only showing product names
+                for index, row in recommended_products.iterrows():
+                    st.markdown(f"- **{row['Product_Name']}**")
             else:
-                st.warning("Please enter a product preference or query before clicking the search button.")
+                st.warning("No recommendations found based on your query. Please try a different query.")
+        else:
+            st.warning("Please enter a product preference or query before clicking the search button.")
 
-        # Option to download the recommended products as a CSV (optional download functionality)
-        top_recommended_products = get_top_recommended_products(uploaded_file)
-        if top_recommended_products is not None:
-            csv = top_recommended_products[['Product_Name', 'Sentiment_Score']].to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="Download Top Recommended Products",
-                data=csv,
-                file_name='top_recommended_products.csv',
-                mime='text/csv'
-            )
+    # Option to download the recommended products as a CSV (optional download functionality)
+    top_recommended_products = get_top_recommended_products(csv_file_path)
+    if top_recommended_products is not None:
+        csv = top_recommended_products[['Product_Name', 'Sentiment_Score']].to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download Top Recommended Products",
+            data=csv,
+            file_name='top_recommended_products.csv',
+            mime='text/csv'
+        )
 
-    except Exception as e:
-        st.error(f"Error reading the CSV file: {e}")
-else:
-    st.warning("Please upload a CSV file to get started.")
+except Exception as e:
+    st.error(f"Error reading the CSV file: {e}")
+
+# Footer
+st.markdown("---")
+st.markdown("### Need Help?")
+st.markdown("Feel free to reach out if you have any questions or need assistance!")
