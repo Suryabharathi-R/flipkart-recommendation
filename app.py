@@ -48,8 +48,8 @@ def recommend_products(query, sentiment_data):
     # Sort products by sentiment score
     recommendations = recommendations.sort_values(by='Sentiment_Score', ascending=False)
 
-    # Return top 5 products
-    return recommendations[['Product_Name', 'Sentiment_Score']].head(5)
+    # Return the names of the top 5 products
+    return recommendations[['Product_Name']].head(5)
 
 # Streamlit app layout
 st.set_page_config(page_title="Product Recommendation Engine", layout="wide")
@@ -57,14 +57,12 @@ st.title("🌟 Product Recommendation Engine 🌟")
 st.markdown("### Find the best products based on your preferences!")
 st.markdown("Enter your product preferences or query below, then click **Search**.")
 
-# File path for CSV (directly inserted)
-csv_file_path = r"C:\Users\surya\Downloads\products_reviews_with_sentiment.csv"
+# File path for CSV (directly inserted as per the request)
+csv_file_path = 'products_reviews_with_sentiment.csv'
 
-# Attempt to load the CSV file
+# Attempt to load the CSV file without displaying data preview
 try:
     sentiment_data = pd.read_csv(csv_file_path)
-    st.write(f"Data from CSV file loaded successfully. Preview of data:")
-    st.write(sentiment_data.head())
 
     # Input for user query
     user_query = st.text_input("What are you looking for? (e.g., best camera phone, lightweight, etc.)", "")
@@ -77,15 +75,15 @@ try:
 
             if not recommended_products.empty:
                 st.markdown("### Recommended Products:")
-                # Display recommended products in a well-formatted manner
+                # Display recommended products in a well-formatted manner, only showing product names
                 for index, row in recommended_products.iterrows():
-                    st.markdown(f"- **{row['Product_Name']}** with Sentiment Score: {row['Sentiment_Score']:.2f}")
+                    st.markdown(f"- **{row['Product_Name']}**")
             else:
                 st.warning("No recommendations found based on your query. Please try a different query.")
         else:
             st.warning("Please enter a product preference or query before clicking the search button.")
 
-    # Option to download the recommended products as a CSV
+    # Option to download the recommended products as a CSV (optional download functionality)
     top_recommended_products = get_top_recommended_products(csv_file_path)
     if top_recommended_products is not None:
         csv = top_recommended_products[['Product_Name', 'Sentiment_Score']].to_csv(index=False).encode('utf-8')
